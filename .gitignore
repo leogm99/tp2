@@ -1,0 +1,9 @@
+CMakeLists.txt
+*.o
+tp
+tp-tsan
+casos
+main.cpp
+Makefile
+salidas
+cmake-build-debug
