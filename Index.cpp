@@ -6,6 +6,9 @@ Index::Index(const string& index_file_path) {
         cout << "could not open file\n";
     }
 
+    // default, se devuelve cuando no encuentro una url
+    this->indexMap["getDefault"] = make_pair(0, 0);
+
     string i_entry;
     while (getline(index_file, i_entry)){
         string url = i_entry.substr(0, i_entry.find_first_of(' '));
@@ -25,12 +28,10 @@ bool Index::contains(const string& url) {
     return indexMap.find(url) != indexMap.end();
 }
 
-pair<uint32_t, uint32_t> Index::getIfPresent(const string& url) {
+const pair<uint32_t, uint32_t>& Index::getIfPresent(const string& url) {
     lock_guard<mutex> lock(indexMutex);
     if(contains(url)){
         return indexMap.at(url);
     }
-    return std::make_pair(0,0);
+    return indexMap.at("getDefault");
 }
-
-Index::~Index() {}
