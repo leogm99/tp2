@@ -1,0 +1,12 @@
+RED='\033[0;31m'
+NC='\033[0m'
+./tp casos/counters/target free-counters.co.uk 1 casos/counters/index casos/counters/pages 3
+echo -e "${RED}\nDone counters\n${NC}"
+./tp casos/exact_domain/target sercom.taller-de-programacion.github.io 4 casos/exact_domain/index casos/exact_domain/pages 2
+echo -e "${RED}\nDone exact_domain\n${NC}"
+./tp casos/incomplete_index/target taller-de-programacion.github.io 4 casos/incomplete_index/index casos/incomplete_index/pages 2
+echo -e "${RED}\nDone incomplete_index\n${NC}"
+./tp casos/nested/target taller-de-programacion.github.io 4 casos/nested/index casos/nested/pages 2
+echo -e "${RED}\nDone nested\n${NC}"
+./tp casos/scrap_single/target www.savewalterwhite.com 1 casos/scrap_single/index casos/scrap_single/pages 3
+echo -e "${RED}\nDone scrap_single\n${NC}"

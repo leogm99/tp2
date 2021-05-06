@@ -14,12 +14,12 @@ vector<string> Crawler::readChunk(uint32_t offset, uint32_t length) {
     size_t bytes = 0;
     vector<string> vec;
     while ((bytes < length) && std::getline(pages, line)){
-        std::size_t pos;
+        std::size_t pos = 0;
         std::size_t endurl_pos;
-        if (((pos = line.find("http://")) != std::string::npos) &&
-            ((endurl_pos = line.find(' ', pos))  != std::string::npos)){
+        while (((pos = line.find("http://", pos)) != std::string::npos) && ((endurl_pos = line.find(' ', pos)) != std::string::npos)){
             std::string url = line.substr(pos, endurl_pos - pos);
             vec.push_back(url);
+            pos+= url.size();
         }
         bytes = (uint32_t) pages.tellg() - offset;
     }
@@ -39,7 +39,6 @@ void Crawler::filterAllowed(vector<string>& rawUrls) {
             if ((*it).size() < this->allowed.size()) {
                 // chau, si la url es mas chica que "allowed", significa que debemos removerla
                 // no existe ningun caso en el que esto sea real.
-                rawUrls.erase(it--);
             } else {
                 // caso interesante, para que sea subdominio
                 // el string debe ser identico desde el primer / hacia la izquierda luego de http://...
@@ -63,14 +62,15 @@ void Crawler::run() {
     while (!this->urls.empty()){
         string& url = this->urls.front();
         final.push_back(url);
+
         const pair<uint32_t, uint32_t>& urlInfo = getUrlInfo(url);
 
         vector<string> v{readChunk(urlInfo.first, urlInfo.second)}; // move const
-
         filterAllowed(v);
+
         this->urls.pop();
-        for (auto& a : v){
-            this->urls.push(std::move(a));
+        for (auto& a : v) {
+            this->urls.push(a);
         }
     }
     sort(final.begin(), final.end());
