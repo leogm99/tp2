@@ -1,11 +1,12 @@
 #include "Index.h"
 
+// Si bien esto se puede hacer con istringstream
+// encontre que la version mas verbosa es considerablemente mas veloz
 Index::Index(const string& index_file_path) {
     ifstream index_file(index_file_path);
     if (!index_file){
         cout << "could not open file\n";
     }
-
     // default, se devuelve cuando no encuentro una url
     this->indexMap["getDefault"] = make_pair(0, 0);
 
