@@ -22,6 +22,9 @@ public:
     // Also you get no default
     Index() = delete;
 
+    Index(Index&& other) noexcept;
+    Index& operator=(Index&& other) noexcept;
+
     const pair<uint32_t, uint32_t>& getIfPresent(const string& url);
 };
 

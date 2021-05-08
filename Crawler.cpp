@@ -1,10 +1,11 @@
 #include "Crawler.h"
 
-Crawler::Crawler(const string& pagesFile, Index& indexMap, string allowed, queue<string>& urls)
-: pages(pagesFile), indexMapping(indexMap), allowed(std::move(allowed)), urls(urls){
+Crawler::Crawler(const string &pagesFile, Index &indexMap, string allowed, BlockingQueue& queue,
+                 vector<string>& doneUrls, mutex& crawlerMutex)
+    : pages(pagesFile.c_str()), indexMapping(indexMap), allowed(std::move(allowed)), urlsQueue(queue), doneUrls(doneUrls),
+      crawlerMutex(crawlerMutex){
     if (!pages){
         cout << "could not open file\n";
-        return;
     }
 }
 
@@ -37,18 +38,8 @@ void Crawler::filterAllowed(vector<string>& rawUrls) {
             rawUrls.erase(it--);
         } else if (*it != this->allowed) {
             if ((*it).size() < this->allowed.size()) {
-                // chau, si la url es mas chica que "allowed", significa que debemos removerla
-                // no existe ningun caso en el que esto sea real.
             } else {
-                // caso interesante, para que sea subdominio
-                // el string debe ser identico desde el primer / hacia la izquierda luego de http://...
-                // es decir -> http://sub.sub.blablaba.com/ -> mi allowed deberia ser blablaba.com
-                // por construccion, todas las urls que esten en el vector, tendran el http:// (prefijo)
-                // y ademas tendran / luego del .com.ar.io.algo. ... -> leo luego del prefijo,
-                // hasta la primera ocurriencia de /, eso sera todo el dominio
-                // el prefijo es de 7, ergo, desde el caracter 7 (indexo en 0) en adelante, leo hasta /
                 size_t last_char = (*it).find_first_of('/', 7);
-                // no es subdominio si esta luego del /
                 if ((pos > last_char) || ((last_char - pos) != this->allowed.size())) {
                     rawUrls.erase(it--);
                 }
@@ -58,26 +49,50 @@ void Crawler::filterAllowed(vector<string>& rawUrls) {
 }
 
 void Crawler::run() {
-    vector<string> final;
-    while (!this->urls.empty()){
-        string& url = this->urls.front();
-        final.push_back(url);
-
-        const pair<uint32_t, uint32_t>& urlInfo = getUrlInfo(url);
-
-        vector<string> v{readChunk(urlInfo.first, urlInfo.second)}; // move const
+    while (!urlsQueue.isClosed()) {
+        string url = std::move(urlsQueue.pop());
+        if (url.empty()){
+            break;
+        }
+        auto urlInfo = getUrlInfo(url);
+        if (!urlInfo.first && !urlInfo.second){
+            store(std::move(url));
+            continue;
+        }
+        vector<string> v = std::move(readChunk(urlInfo.first, urlInfo.second)); // move const
         filterAllowed(v);
-
-        this->urls.pop();
-        for (auto& a : v) {
-            this->urls.push(a);
+        store(std::move(url));
+        for (string filteredUrl : v) {
+            urlsQueue.push(std::move(filteredUrl));
         }
     }
-    sort(final.begin(), final.end());
-    for (const auto &a : final)
-        cout << a << endl;
+}
+
+void Crawler::store(string&& url) {
+    lock_guard<mutex> lock(crawlerMutex);
+    doneUrls.push_back(url);
 }
 
 Crawler::~Crawler() {
-    this->pages.close();
+    //this->pages.close(); // es raii, no hace falta cerrar el archivo aca
 }
+
+
+
+/*Crawler::Crawler(Crawler &&other) noexcept : indexMapping(other.indexMapping) {
+    this->pages = std::move(other.pages);
+    this->allowed = std::move(other.allowed);
+    this->urlsQueue = std::move(other.urlsQueue);
+    this->doneUrls = std::move(other.doneUrls);
+    this->crawlerMutex = std::move(other.crawlerMutex);
+}
+
+Crawler& Crawler::operator=(Crawler&& other) noexcept {
+    this->pages = std::move(other.pages);
+    this->allowed = std::move(other.allowed);
+    this->urlsQueue = std::move(other.urlsQueue);
+    this->doneUrls = std::move(other.doneUrls);
+    this->crawlerMutex = std::move(other.crawlerMutex);
+    return *this;
+}
+*/

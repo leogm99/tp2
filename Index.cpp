@@ -36,3 +36,14 @@ const pair<uint32_t, uint32_t>& Index::getIfPresent(const string& url) {
     }
     return indexMap.at("getDefault");
 }
+
+Index::Index(Index &&other) noexcept {
+    this->indexMap = std::move(other.indexMap);
+    other.indexMap.clear();
+}
+
+Index &Index::operator=(Index &&other) noexcept {
+    this->indexMap = std::move(other.indexMap);
+    other.indexMap.clear();
+    return *this;
+}
