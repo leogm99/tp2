@@ -1,7 +1,7 @@
 #include "Crawler.h"
 
 Crawler::Crawler(const string &pagesFile, Index &indexMap, string allowed, BlockingQueue& queue,
-                 vector<string>& doneUrls, mutex& crawlerMutex)
+                 vector<pair<string, UrlState>>& doneUrls, mutex& crawlerMutex)
     : pages(pagesFile.c_str()), indexMapping(indexMap), allowed(std::move(allowed)), urlsQueue(queue), doneUrls(doneUrls),
       crawlerMutex(crawlerMutex){
     if (!pages){
@@ -36,13 +36,10 @@ void Crawler::filterAllowed(vector<string>& rawUrls) {
         size_t pos = (*it).find(this->allowed);
         if (pos == string::npos) {
             rawUrls.erase(it--);
-        } else if (*it != this->allowed) {
-            if ((*it).size() < this->allowed.size()) {
-            } else {
-                size_t last_char = (*it).find_first_of('/', 7);
-                if ((pos > last_char) || ((last_char - pos) != this->allowed.size())) {
-                    rawUrls.erase(it--);
-                }
+        } else {
+            size_t last_char = (*it).find_first_of('/', 7);
+            if ((pos > last_char) || ((last_char - pos) != this->allowed.size())) {
+                rawUrls.erase(it--);
             }
         }
     }
@@ -56,19 +53,19 @@ void Crawler::run() {
         }
         auto urlInfo = getUrlInfo(url);
         if (!urlInfo.first && !urlInfo.second){
-            store(std::move(url));
+            store(move(make_pair(move(url), UrlState::DEAD)));
             continue;
         }
         vector<string> v = std::move(readChunk(urlInfo.first, urlInfo.second)); // move const
         filterAllowed(v);
-        store(std::move(url));
+        store(move(make_pair(move(url), UrlState::EXPLORED)));
         for (string filteredUrl : v) {
             urlsQueue.push(std::move(filteredUrl));
         }
     }
 }
 
-void Crawler::store(string&& url) {
+void Crawler::store(pair<string, UrlState>&& url) {
     lock_guard<mutex> lock(crawlerMutex);
     doneUrls.push_back(url);
 }

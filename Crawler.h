@@ -3,6 +3,7 @@
 #include "Thread.h"
 #include "Index.h"
 #include "BlockingQueue.h"
+#include "UrlState.h"
 #include <vector>
 #include <utility>
 #include <algorithm>
@@ -15,7 +16,7 @@ private:
     Index& indexMapping;
     string allowed;
     BlockingQueue& urlsQueue;
-    vector<string>& doneUrls;
+    vector<pair<string, UrlState>>& doneUrls;
     mutex& crawlerMutex;
 
 protected:
@@ -24,7 +25,7 @@ protected:
 public:
     //explicit Crawler(const string& pagesFile, Index& indexMap, const string& allowed, queue<string>& urls);
     explicit Crawler(const string& pagesFile, Index& indexMap,
-                     string allowed, BlockingQueue& queue, vector<string>& doneUrls, mutex& crawlerMutex);
+                     string allowed, BlockingQueue& queue, vector<pair<string, UrlState>>& doneUrls, mutex& crawlerMutex);
 
     // don't want any ugly copies
     Crawler(const Crawler& other) = delete;
@@ -38,7 +39,7 @@ public:
     void filterAllowed(vector<string>& rawUrls);
     const pair<uint32_t, uint32_t>& getUrlInfo(const string& url);
 
-    void store(string&& url);
+    void store(pair<string, UrlState>&& url);
     ~Crawler() override;
 
 };
