@@ -6,6 +6,7 @@
 #include <condition_variable>
 #include <thread>
 #include <string>
+#include <utility>
 
 class BlockingQueue {
 private:

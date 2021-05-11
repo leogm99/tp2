@@ -1,7 +1,3 @@
-//
-// Created by leogm99 on 7/5/21.
-//
-
 #ifndef TP2_THREAD_H
 #define TP2_THREAD_H
 #include <thread>
@@ -28,4 +24,4 @@ public:
 };
 
 
-#endif //TP2_THREAD_H
+#endif

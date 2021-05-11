@@ -1,8 +1,5 @@
-//
-// Created by leogm99 on 7/5/21.
-//
-
 #include "Thread.h"
+#include <utility>
 
 Thread::Thread(Thread&& other) noexcept {
     this->handler = std::move(other.handler);
