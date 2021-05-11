@@ -15,7 +15,7 @@ private:
     std::mutex queueMutex;
     std::condition_variable cv;
 public:
-    BlockingQueue(std::queue<std::string>& urls);
+    explicit BlockingQueue(std::queue<std::string>& urls);
 
     BlockingQueue() = delete;
     BlockingQueue(const BlockingQueue& other) = delete;
