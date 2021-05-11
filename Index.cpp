@@ -1,49 +1,45 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <map>
+#include <mutex>
+#include <utility>
 #include "Index.h"
 
 // Si bien esto se puede hacer con istringstream
 // encontre que la version mas verbosa es considerablemente mas veloz
-Index::Index(const string& index_file_path) {
-    ifstream index_file(index_file_path);
+Index::Index(const std::string& index_file_path) {
+    std::ifstream index_file(index_file_path);
     if (!index_file){
-        cout << "could not open file\n";
+        std::cout << "could not open file\n";
     }
     // default, se devuelve cuando no encuentro una url
-    this->indexMap["getDefault"] = make_pair(0, 0);
+    this->indexMap["getDefault"] = std::make_pair(0, 0);
 
-    string i_entry;
+    std::string i_entry;
     while (getline(index_file, i_entry)){
-        string url = i_entry.substr(0, i_entry.find_first_of(' '));
-        size_t end_of_offset = 0;
-        uint32_t offset = stoul(i_entry.substr(url.size(),
+        std::string url = i_entry.substr(0,
+                                         i_entry.find_first_of(' '));
+        std::size_t end_of_offset = 0;
+        uint32_t offset = std::stoul(i_entry.substr(url.size(),
                                 i_entry.find_first_of(' ')),
                                 &end_of_offset, 16);
-        uint32_t length = stoul(i_entry.substr(end_of_offset + url.size(),
+        uint32_t length = std::stoul(i_entry.substr(end_of_offset + url.size(),
                              i_entry.find_last_of(' ')),
                                 nullptr, 16);
         this->indexMap[url] = std::make_pair(offset, length);
     }
-    index_file.close();
 }
 
-bool Index::contains(const string& url) {
+bool Index::contains(const std::string& url) const {
     return indexMap.find(url) != indexMap.end();
 }
 
-const pair<uint32_t, uint32_t>& Index::getIfPresent(const string& url) {
-    lock_guard<mutex> lock(indexMutex);
-    if(contains(url)){
+const std::pair<uint32_t, uint32_t>& Index::
+getIfPresent(const std::string& url) {
+    std::lock_guard<std::mutex> lock(indexMutex);
+    if (contains(url)){
         return indexMap.at(url);
     }
     return indexMap.at("getDefault");
-}
-
-Index::Index(Index &&other) noexcept {
-    this->indexMap = std::move(other.indexMap);
-    other.indexMap.clear();
-}
-
-Index &Index::operator=(Index &&other) noexcept {
-    this->indexMap = std::move(other.indexMap);
-    other.indexMap.clear();
-    return *this;
 }

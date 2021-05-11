@@ -5,16 +5,15 @@
 #include <string>
 #include <map>
 #include <mutex>
-
-using namespace std;
+#include <utility>
 
 class Index {
 private:
-    map<string, pair<uint32_t, uint32_t>> indexMap;
-    mutex indexMutex;
-    bool contains(const string& key);
+    std::map<std::string, std::pair<uint32_t, uint32_t>> indexMap;
+    std::mutex indexMutex;
+    bool contains(const std::string& key) const;
 public:
-    explicit Index(const string& index_file_path);
+    explicit Index(const std::string& index_file_path);
 
     // No copy allowed
     Index(const Index& other) = delete;
@@ -22,11 +21,7 @@ public:
     // Also you get no default
     Index() = delete;
 
-    Index(Index&& other) noexcept;
-    Index& operator=(Index&& other) noexcept;
-
-    const pair<uint32_t, uint32_t>& getIfPresent(const string& url);
+    const std::pair<uint32_t, uint32_t>& getIfPresent(const std::string& url);
 };
-
 
 #endif //TP2_INDEX_H

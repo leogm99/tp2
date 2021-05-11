@@ -4,45 +4,42 @@
 #include "Index.h"
 #include "BlockingQueue.h"
 #include "UrlState.h"
+#include <string>
 #include <vector>
 #include <utility>
 #include <algorithm>
 
-using namespace std;
-
 class Crawler : public Thread{
 private:
-    ifstream pages;
+    std::ifstream pages;
     Index& indexMapping;
-    string allowed;
+    std::string allowed;
     BlockingQueue& urlsQueue;
-    vector<pair<string, UrlState>>& doneUrls;
-    mutex& crawlerMutex;
+    std::vector<std::pair<std::string, UrlState>>& doneUrls;
+    std::mutex& crawlerMutex;
 
 protected:
     void run() override;
 
 public:
-    //explicit Crawler(const string& pagesFile, Index& indexMap, const string& allowed, queue<string>& urls);
-    explicit Crawler(const string& pagesFile, Index& indexMap,
-                     string allowed, BlockingQueue& queue, vector<pair<string, UrlState>>& doneUrls, mutex& crawlerMutex);
+    Crawler(const std::string& pagesFile, Index& indexMap,
+            std::string allowed, BlockingQueue& queue,
+            std::vector<std::pair<std::string,
+            UrlState>>& doneUrls, std::mutex& crawlerMutex);
 
     // don't want any ugly copies
     Crawler(const Crawler& other) = delete;
     Crawler& operator= (const Crawler& other) = delete;
-    Crawler() = delete;
 
-    //Crawler(Crawler&& other) noexcept;
-    //Crawler& operator=(Crawler&& other) noexcept;
+    Crawler(Crawler&& other);
+    Crawler& operator= (Crawler&& other);
 
-    vector<string> readChunk(uint32_t offset, uint32_t length);
-    void filterAllowed(vector<string>& rawUrls);
-    const pair<uint32_t, uint32_t>& getUrlInfo(const string& url);
+    std::vector<std::string> readChunk(uint32_t offset, uint32_t length);
+    void filterAllowed(std::vector<std::string>& rawUrls);
+    const std::pair<uint32_t, uint32_t>& getUrlInfo(const std::string& url);
 
-    void store(pair<string, UrlState>&& url);
+    void store(std::pair<std::string, UrlState>&& url);
     ~Crawler() override;
-
 };
-
 
 #endif //TP2_CRAWLER_H

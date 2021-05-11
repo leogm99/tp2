@@ -14,7 +14,7 @@ Thread& Thread::operator=(Thread&& other) noexcept {
 }
 
 void Thread::start() {
-    handler = thread(&Thread::run, this);
+    handler = std::thread(&Thread::run, this);
 }
 
 void Thread::join() {

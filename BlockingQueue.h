@@ -4,29 +4,27 @@
 #include <queue>
 #include <mutex>
 #include <condition_variable>
-using namespace std;
+#include <thread>
+#include <string>
 
 class BlockingQueue {
 private:
     bool closed;
-    queue<string>& urls;
-    mutex queueMutex;
-    condition_variable cv;
+    std::queue<std::string>& urls;
+    std::mutex queueMutex;
+    std::condition_variable cv;
 public:
-    explicit BlockingQueue(queue<string>& urls);
+    explicit BlockingQueue(std::queue<std::string>& urls);
 
     BlockingQueue() = delete;
     BlockingQueue(const BlockingQueue& other) = delete;
     BlockingQueue& operator=(const BlockingQueue& other) = delete;
 
-    //BlockingQueue(BlockingQueue&& other);
-    //BlockingQueue& operator= (BlockingQueue&& other) noexcept;
-
     bool isClosed();
     void signalClosed();
 
-    string pop();
-    void push(string&& url);
+    std::string pop();
+    void push(std::string&& url);
 };
 
 

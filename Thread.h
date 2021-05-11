@@ -5,11 +5,10 @@
 #ifndef TP2_THREAD_H
 #define TP2_THREAD_H
 #include <thread>
-using namespace std;
 
 class Thread {
 private:
-    thread handler;
+    std::thread handler;
 protected:
     virtual void run() = 0;
 public:
@@ -26,7 +25,6 @@ public:
     void join();
 
     virtual ~Thread() = default;
-
 };
 
 
