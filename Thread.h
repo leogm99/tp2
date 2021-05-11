@@ -14,8 +14,8 @@ public:
     Thread(const Thread& other) = delete;
     Thread& operator= (const Thread& other) = delete;
 
-    Thread(Thread&& other) noexcept;
-    Thread& operator= (Thread&& other) noexcept;
+    Thread(Thread&& other);
+    Thread& operator= (Thread&& other);
 
     void start();
     void join();

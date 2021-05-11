@@ -24,4 +24,4 @@ public:
     const std::pair<uint32_t, uint32_t>& getIfPresent(const std::string& url);
 };
 
-#endif //TP2_INDEX_H
+#endif

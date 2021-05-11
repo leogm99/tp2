@@ -1,6 +1,3 @@
-//
-// Created by leogm99 on 6/5/21.
-//
 #include "BlockingQueue.h"
 #include <queue>
 #include <string>

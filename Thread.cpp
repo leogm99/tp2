@@ -1,11 +1,11 @@
 #include "Thread.h"
 #include <utility>
 
-Thread::Thread(Thread&& other) noexcept {
+Thread::Thread(Thread&& other) {
     this->handler = std::move(other.handler);
 }
 
-Thread& Thread::operator=(Thread&& other) noexcept {
+Thread& Thread::operator=(Thread&& other) {
     this->handler = std::move(other.handler);
     return *this;
 }

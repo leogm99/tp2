@@ -15,7 +15,7 @@ private:
     std::mutex queueMutex;
     std::condition_variable cv;
 public:
-    explicit BlockingQueue(std::queue<std::string>& urls);
+    BlockingQueue(std::queue<std::string>& urls);
 
     BlockingQueue() = delete;
     BlockingQueue(const BlockingQueue& other) = delete;
@@ -29,4 +29,4 @@ public:
 };
 
 
-#endif //TP2_BLOCKINGQUEUE_H
+#endif

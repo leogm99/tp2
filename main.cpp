@@ -1,6 +1,5 @@
 #include "Index.h"
 #include "Crawler.h"
-#include "UrlState.h"
 #include <chrono>
 #include <utility>
 #include <queue>
@@ -8,36 +7,24 @@
 #include <vector>
 #include <algorithm>
 
-static void loadTargets(std::queue<std::string>& targetUrls,
-                        std::string&& targetPath){
-    std::ifstream f(targetPath);
-    if (!f){
-        std::cout << "could not load targets\n";
-    }
-    std::string url;
-    while (getline(f, url)){
-        targetUrls.emplace(url);
-    }
-}
-
-static std::string handleUrlState(const UrlState& state){
-    switch (state){
-        case UrlState::READY:
-            return std::string("ready");
-        case UrlState::EXPLORED:
-            return std::string("explored");
-        case UrlState::DEAD:
-            return std::string("dead");
-    }
-    return std::string();
-}
 
 int main(int argc, const char* argv[]){
+    if (argc != 7){
+        return -1;
+    }
+
     std::queue<std::string> target_urls;
-    loadTargets(target_urls, argv[1]);
+    std::ifstream f(argv[1]);
+    if (!f){
+        return -1;
+    }
+    std::string url;
+    while (getline(f, url)) {
+        target_urls.emplace(url);
+    }
 
     BlockingQueue bq(target_urls);
-    std::vector<std::pair<std::string, UrlState>> doneUlrs;
+    std::vector<std::pair<std::string, std::string>> doneUlrs;
 
     Index index(argv[4]);
     int workers = atoi(argv[3]);
@@ -65,14 +52,14 @@ int main(int argc, const char* argv[]){
     }
 
     sort(doneUlrs.begin(), doneUlrs.end(),
-         [=](const std::pair<std::string, UrlState> &l,
-             const std::pair<std::string, UrlState> &r) {
+         [=](const std::pair<std::string, std::string> &l,
+             const std::pair<std::string, std::string> &r) {
         return l.first < r.first;
     });
 
     for (const auto& a : doneUlrs){
         std::cout << a.first << " -> "
-        << std::move(handleUrlState(a.second)) << std::endl;
+        << a.second << std::endl;
     }
     return 0;
 }

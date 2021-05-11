@@ -5,7 +5,7 @@
 
 Crawler::Crawler(const std::string &pagesFile, Index &indexMap,
                  std::string allowed, BlockingQueue& queue,
-                 std::vector<std::pair<std::string, UrlState>>& doneUrls,
+                 std::vector<std::pair<std::string, std::string>>& doneUrls,
                  std::mutex& crawlerMutex)
     : pages(pagesFile.c_str()), indexMapping(indexMap),
       allowed(std::move(allowed)), urlsQueue(queue), doneUrls(doneUrls),
@@ -66,21 +66,21 @@ void Crawler::run() {
         auto urlInfo = getUrlInfo(url);
         if (!urlInfo.first && !urlInfo.second){
             store(std::move(
-                    std::make_pair(move(url), UrlState::DEAD)));
+                    std::make_pair(move(url), std::string("dead"))));
             continue;
         }
         std::vector<std::string> v = std::move(readChunk(urlInfo.first,
                                                             urlInfo.second));
         filterAllowed(v);
         store(std::move(
-                std::make_pair(std::move(url), UrlState::EXPLORED)));
+                std::make_pair(std::move(url), std::string("explored"))));
         for (std::string& filteredUrl : v) {
             urlsQueue.push(std::move(filteredUrl));
         }
     }
 }
 
-void Crawler::store(std::pair<std::string, UrlState>&& url) {
+void Crawler::store(std::pair<std::string, std::string>&& url) {
     std::lock_guard<std::mutex> lock(crawlerMutex);
     doneUrls.push_back(url);
 }
