@@ -3,15 +3,15 @@
 #include <utility>
 #include <string>
 #include <vector>
+#include <map>
 
 Crawler::Crawler(PagesHandler& pages, Index &indexMap,
                  std::string& allowed, BlockingQueue& queue,
-                 std::vector<std::pair<std::string, std::string>>& doneUrls,
+                 std::map<std::string, std::string>& doneUrls,
                  std::mutex& crawlerMutex)
     : pages(pages), indexMapping(indexMap),
       allowed(allowed), urlsQueue(queue), doneUrls(doneUrls),
       crawlerMutex(crawlerMutex){
-
 }
 
 const std::pair<uint32_t, uint32_t>& Crawler::
@@ -60,9 +60,9 @@ void Crawler::run() {
     }
 }
 
-void Crawler::store(std::pair<std::string, std::string>&& url) {
+void Crawler::store(std::pair<std::string, std::string> url) {
     std::lock_guard<std::mutex> lock(crawlerMutex);
-    doneUrls.push_back(std::move(url));
+    doneUrls.insert(std::move(url));
 }
 
 Crawler::~Crawler() {

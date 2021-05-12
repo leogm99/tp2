@@ -1,16 +1,15 @@
 #include "Index.h"
+#include "CrawlerHandler.h"
 #include "Crawler.h"
 #include "PagesHandler.h"
-#include <chrono>
 #include <utility>
 #include <queue>
 #include <string>
-#include <vector>
-#include <algorithm>
 
+const int NUM_ARGS = 7;
 
 int main(int argc, const char* argv[]){
-    if (argc != 7){
+    if (argc != NUM_ARGS){
         return -1;
     }
     PagesHandler pages(argv[5]);
@@ -23,46 +22,14 @@ int main(int argc, const char* argv[]){
 
     std::string url;
     while (getline(f, url)) {
-        target_urls.emplace(url);
+        target_urls.emplace(std::move(url));
     }
 
     BlockingQueue bq(target_urls);
-    std::vector<std::pair<std::string, std::string>> doneUlrs;
-
     Index index(argv[4]);
-    int workers = atoi(argv[3]);
-
-    std::vector<Crawler> myLittleSpiders;
-    std::mutex crawlerMutex;
     std::string allowed = argv[2];
-    for (int i = 0; i < workers; ++i){
-        myLittleSpiders.emplace_back(
-                std::move(
-                        Crawler(pages, index,
-                                allowed, bq, doneUlrs, crawlerMutex)));
-    }
-
-    for (auto & myLittleSpider : myLittleSpiders){
-        myLittleSpider.start();
-    }
-
-    std::chrono::seconds time_sec(atoi(argv[6]));
-    std::this_thread::sleep_for(time_sec);
-    bq.signalClosed();
-
-    for (auto & myLittleSpider : myLittleSpiders){
-        myLittleSpider.join();
-    }
-
-    sort(doneUlrs.begin(), doneUlrs.end(),
-         [=](const std::pair<std::string, std::string> &l,
-             const std::pair<std::string, std::string> &r) {
-        return l.first < r.first;
-    });
-
-    for (const auto& a : doneUlrs){
-        std::cout << a.first << " -> "
-        << a.second << std::endl;
-    }
+    CrawlerHandler ch(atoi(argv[3]), pages, index, bq, std::move(allowed));
+    ch.doStart(atoi(argv[6]));
+    ch.printDone();
     return 0;
 }

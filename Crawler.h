@@ -4,6 +4,10 @@
 #include "Index.h"
 #include "BlockingQueue.h"
 #include "PagesHandler.h"
+#include <utility>
+#include <map>
+#include <string>
+#include <vector>
 
 class Crawler : public Thread{
 private:
@@ -11,8 +15,12 @@ private:
     Index& indexMapping;
     std::string& allowed;
     BlockingQueue& urlsQueue;
-    std::vector<std::pair<std::string, std::string>>& doneUrls;
+    std::map<std::string, std::string>& doneUrls;
     std::mutex& crawlerMutex;
+
+    void filterAllowed(std::vector<std::string>& rawUrls);
+    const std::pair<uint32_t, uint32_t>& getUrlInfo(const std::string& url);
+    void store(std::pair<std::string, std::string> state);
 
 protected:
     void run() override;
@@ -20,8 +28,8 @@ protected:
 public:
     Crawler(PagesHandler& pages, Index& indexMap,
             std::string& allowed, BlockingQueue& queue,
-            std::vector<std::pair<std::string,
-            std::string>>& doneUrls, std::mutex& crawlerMutex);
+            std::map<std::string, std::string>& doneUrls,
+            std::mutex& crawlerMutex);
 
     // don't want any ugly copies
     Crawler(const Crawler& other) = delete;
@@ -30,10 +38,7 @@ public:
     Crawler(Crawler&& other);
     Crawler& operator= (Crawler&& other);
 
-    void filterAllowed(std::vector<std::string>& rawUrls);
-    const std::pair<uint32_t, uint32_t>& getUrlInfo(const std::string& url);
 
-    void store(std::pair<std::string, std::string>&& url);
     ~Crawler() override;
 };
 
