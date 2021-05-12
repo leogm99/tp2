@@ -27,7 +27,7 @@ Index::Index(const std::string& index_file_path) {
         uint32_t length = std::stoul(i_entry.substr(end_of_offset + url.size(),
                              i_entry.find_last_of(' ')),
                                 nullptr, 16);
-        this->indexMap[url] = std::make_pair(offset, length);
+        this->indexMap[std::move(url)] = std::make_pair(offset, length);
     }
 }
 
@@ -36,8 +36,7 @@ bool Index::contains(const std::string& url) const {
 }
 
 const std::pair<uint32_t, uint32_t>& Index::
-getIfPresent(const std::string& url) {
-    std::lock_guard<std::mutex> lock(indexMutex);
+getIfPresent(const std::string& url) const {
     if (contains(url)){
         return indexMap.at(url);
     }

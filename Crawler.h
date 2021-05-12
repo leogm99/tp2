@@ -3,16 +3,13 @@
 #include "Thread.h"
 #include "Index.h"
 #include "BlockingQueue.h"
-#include <string>
-#include <vector>
-#include <utility>
-#include <algorithm>
+#include "PagesHandler.h"
 
 class Crawler : public Thread{
 private:
-    std::ifstream pages;
+    PagesHandler& pages;
     Index& indexMapping;
-    std::string allowed;
+    std::string& allowed;
     BlockingQueue& urlsQueue;
     std::vector<std::pair<std::string, std::string>>& doneUrls;
     std::mutex& crawlerMutex;
@@ -21,8 +18,8 @@ protected:
     void run() override;
 
 public:
-    Crawler(const std::string& pagesFile, Index& indexMap,
-            std::string allowed, BlockingQueue& queue,
+    Crawler(PagesHandler& pages, Index& indexMap,
+            std::string& allowed, BlockingQueue& queue,
             std::vector<std::pair<std::string,
             std::string>>& doneUrls, std::mutex& crawlerMutex);
 
@@ -33,7 +30,6 @@ public:
     Crawler(Crawler&& other);
     Crawler& operator= (Crawler&& other);
 
-    std::vector<std::string> readChunk(uint32_t offset, uint32_t length);
     void filterAllowed(std::vector<std::string>& rawUrls);
     const std::pair<uint32_t, uint32_t>& getUrlInfo(const std::string& url);
 

@@ -10,7 +10,6 @@
 class Index {
 private:
     std::map<std::string, std::pair<uint32_t, uint32_t>> indexMap;
-    std::mutex indexMutex;
     bool contains(const std::string& key) const;
 public:
     explicit Index(const std::string& index_file_path);
@@ -21,7 +20,8 @@ public:
     // Also you get no default
     Index() = delete;
 
-    const std::pair<uint32_t, uint32_t>& getIfPresent(const std::string& url);
+    const std::pair<uint32_t, uint32_t>&
+    getIfPresent(const std::string& url) const;
 };
 
 #endif
