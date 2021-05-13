@@ -18,7 +18,7 @@ private:
     std::map<std::string, std::string>& doneUrls;
     std::mutex& crawlerMutex;
 
-    void filterAllowed(std::vector<std::string>& rawUrls);
+    void filterAllowed(std::vector<std::string>& rawUrls) const;
     const std::pair<uint32_t, uint32_t>& getUrlInfo(const std::string& url);
     void store(std::pair<std::string, std::string> state);
 

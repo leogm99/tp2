@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 Crawler::Crawler(PagesHandler& pages, Index &indexMap,
                  std::string& allowed, BlockingQueue& queue,
@@ -19,22 +20,21 @@ getUrlInfo(const std::string &url) {
     return this->indexMapping.getIfPresent(url);
 }
 
-void Crawler::filterAllowed(std::vector<std::string>& rawUrls) {
-    auto it = rawUrls.begin();
-    while (it != rawUrls.end()){
-        std::size_t pos = (*it).find(this->allowed);
-        if (pos == std::string::npos) {
-            it = rawUrls.erase(it);
-        } else {
-            std::size_t last_char = (*it).find_first_of('/', 7);
-            if ((pos > last_char) ||
-                ((last_char - pos) != this->allowed.size())) {
-                it = rawUrls.erase(it);
-            } else {
-                ++it;
-            }
+void Crawler::filterAllowed(std::vector<std::string>& rawUrls) const {
+    auto end = std::remove_if(rawUrls.begin(), rawUrls.end(),
+    [&](const std::string& url){
+        std::size_t pos = url.find(allowed);
+        if (pos == std::string::npos){
+            return true;
         }
-    }
+        std::size_t lastForwardSlash = url.find_first_of('/', 7); // http://
+        if (pos > lastForwardSlash ||
+            (lastForwardSlash - pos) != this->allowed.size()){
+            return true;
+        }
+        return false;
+    });
+    rawUrls.erase(end, rawUrls.end());
 }
 
 void Crawler::run() {
@@ -79,3 +79,4 @@ Crawler::Crawler(Crawler &&other)
 Crawler& Crawler::operator=(Crawler &&other) {
     return *this;
 }
+
