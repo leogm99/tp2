@@ -16,7 +16,7 @@ Crawler::Crawler(PagesHandler& pages, Index &indexMap,
 }
 
 const std::pair<uint32_t, uint32_t>& Crawler::
-getUrlInfo(const std::string &url) {
+getUrlInfo(const std::string &url) const {
     return this->indexMapping.getIfPresent(url);
 }
 

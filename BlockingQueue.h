@@ -11,11 +11,13 @@
 class BlockingQueue {
 private:
     bool closed;
-    std::queue<std::string>& urls;
+    std::queue<std::pair<std::string,
+                         std::string>>& urls;
     std::mutex queueMutex;
     std::condition_variable cv;
 public:
-    explicit BlockingQueue(std::queue<std::string>& urls);
+    explicit BlockingQueue(std::queue<std::pair<std::string,
+                           std::string>>& urls);
 
     BlockingQueue() = delete;
     BlockingQueue(const BlockingQueue& other) = delete;

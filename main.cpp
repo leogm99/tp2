@@ -14,7 +14,7 @@ int main(int argc, const char* argv[]){
     }
     PagesHandler pages(argv[5]);
 
-    std::queue<std::string> target_urls;
+    std::queue<std::pair<std::string, std::string>> target_urls;
     std::ifstream f(argv[1]);
     if (!f){
         return -1;
@@ -22,7 +22,8 @@ int main(int argc, const char* argv[]){
 
     std::string url;
     while (getline(f, url)) {
-        target_urls.emplace(std::move(url));
+        target_urls.emplace(
+                std::make_pair(std::move(url), "ready"));
     }
 
     BlockingQueue bq(target_urls);
