@@ -36,3 +36,18 @@ void CrawlerHandler::printDone() {
     for (auto it = doneUrls.begin(); it != doneUrls.end(); ++it)
         std::cout << it->first << " -> " << it->second << '\n';
 }
+
+CrawlerHandler::CrawlerHandler(CrawlerHandler &&other)
+: numWorkers(other.numWorkers),
+  pages(other.pages), index(other.index), q(other.q),
+  allowed(std::move(other.allowed)),
+  doneUrls(std::move(other.doneUrls)){
+    other.numWorkers = 0;
+}
+
+CrawlerHandler &CrawlerHandler::operator=(CrawlerHandler &&other) {
+    this->numWorkers = other.numWorkers;
+    other.numWorkers = 0;
+    this->allowed = std::move(other.allowed);
+    return *this;
+}

@@ -26,6 +26,9 @@ public:
     CrawlerHandler(const CrawlerHandler& other) = delete;
     CrawlerHandler& operator=(const CrawlerHandler& other) = delete;
 
+    CrawlerHandler(CrawlerHandler&& other);
+    CrawlerHandler& operator=(CrawlerHandler&& other);
+
     void doStart(int time);
 
     void printDone();
