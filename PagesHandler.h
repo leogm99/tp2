@@ -17,6 +17,9 @@ public:
 
     PagesHandler(const PagesHandler& other) = delete;
     PagesHandler& operator=(const PagesHandler& other) = delete;
+
+    PagesHandler(PagesHandler&& other);
+    PagesHandler& operator=(PagesHandler&& other);
 };
 
 

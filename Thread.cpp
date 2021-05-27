@@ -6,6 +6,9 @@ Thread::Thread(Thread&& other) {
 }
 
 Thread& Thread::operator=(Thread&& other) {
+    if (this == &other){
+        return *this;
+    }
     this->handler = std::move(other.handler);
     return *this;
 }

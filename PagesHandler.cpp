@@ -31,3 +31,15 @@ PagesHandler::operator()(std::pair <uint32_t, uint32_t> urlInfo) {
     }
     return vec;
 }
+
+PagesHandler::PagesHandler(PagesHandler &&other)
+: std::move(other.pageHandler){
+}
+
+PagesHandler &PagesHandler::operator=(PagesHandler &&other) {
+    if (this == &other){
+        return *this;
+    }
+    pageHandler = std::move(other.pageHandler);
+    return *this;
+}

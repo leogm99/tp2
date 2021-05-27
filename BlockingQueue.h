@@ -23,6 +23,9 @@ public:
     BlockingQueue(const BlockingQueue& other) = delete;
     BlockingQueue& operator=(const BlockingQueue& other) = delete;
 
+    BlockingQueue(BlockingQueue&& other);
+    BlockingQueue& operator=(BlockingQueue&& other);
+
     bool isNotClosedOrNotEmpty();
     void signalClosed();
 

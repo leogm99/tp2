@@ -40,3 +40,16 @@ void BlockingQueue::signalClosed() {
     closed = true;
     cv.notify_all();
 }
+
+BlockingQueue::BlockingQueue(BlockingQueue &&other)
+: closed(other.closed), urls(std::move(other.urls)){
+}
+
+BlockingQueue &BlockingQueue::operator=(BlockingQueue &&other) {
+    if (this == &other) {
+        return *this;
+    }
+    closed = other.closed;
+    urls = std::move(other.urls);
+    return *this;
+}

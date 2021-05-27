@@ -11,7 +11,7 @@
 Index::Index(const std::string& index_file_path) {
     std::ifstream index_file(index_file_path);
     if (!index_file.is_open()){
-        throw std::invalid_argument("could not open file\n");
+        throw std::invalid_argument("Could not open Index file\n");
     }
     // default, se devuelve cuando no encuentro una url
     this->indexMap["getDefault"] = std::make_pair(0, 0);
@@ -42,4 +42,16 @@ getIfPresent(const Url& url) const {
         return indexMap.at(rawUrl);
     }
     return indexMap.at("getDefault");
+}
+
+Index::Index(Index &&other)
+: indexMap(std::move(other.indexMap)){
+}
+
+Index &Index::operator=(Index &&other) {
+    if (this == &other){
+        return *this;
+    }
+    indexMap = std::move(other.indexMap);
+    return *this;
 }

@@ -6,7 +6,7 @@
 TargetLoader::TargetLoader(const char *targetPath) {
     target.open(targetPath);
     if (!target.is_open()){
-        throw std::invalid_argument("Target file could not open");
+        throw std::invalid_argument("Could not open Target file\n");
     }
 }
 

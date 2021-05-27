@@ -21,6 +21,9 @@ public:
     // Also you get no default
     Index() = delete;
 
+    Index(Index&& other);
+    Index& operator= (Index&& other);
+
     const std::pair<uint32_t, uint32_t>&
     getIfPresent(const Url& url) const;
 };

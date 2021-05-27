@@ -13,15 +13,20 @@ int main(int argc, const char* argv[]){
     if (argc != NUM_ARGS){
         return -1;
     }
-
-    TargetLoader targetLoader(argv[1]);
-    PagesHandler pages(argv[5]);
-    Index index(argv[4]);
-
-    BlockingQueue bq(targetLoader);
     std::string allowed = argv[2];
-    CrawlerHandler ch(atoi(argv[3]), pages, index, bq, std::move(allowed));
-    ch.doStart(atoi(argv[6]));
-    ch.printDone();
+
+    try {
+        TargetLoader targetLoader(argv[1]);
+        PagesHandler pages(argv[5]);
+        Index index(argv[4]);
+
+        BlockingQueue bq(targetLoader);
+        CrawlerHandler ch(atoi(argv[3]), pages, index, bq, std::move(allowed));
+        ch.doStart(atoi(argv[6]));
+        ch.printDone();
+    } catch(const std::invalid_argument& e){
+        std::cout << e.what();
+        return -1;
+    }
     return 0;
 }
