@@ -10,8 +10,8 @@
 // encontre que la version mas verbosa es considerablemente mas veloz
 Index::Index(const std::string& index_file_path) {
     std::ifstream index_file(index_file_path);
-    if (!index_file){
-        std::cout << "could not open file\n";
+    if (!index_file.is_open()){
+        throw std::invalid_argument("could not open file\n");
     }
     // default, se devuelve cuando no encuentro una url
     this->indexMap["getDefault"] = std::make_pair(0, 0);
@@ -36,9 +36,10 @@ bool Index::contains(const std::string& url) const {
 }
 
 const std::pair<uint32_t, uint32_t>& Index::
-getIfPresent(const std::string& url) const {
-    if (contains(url)){
-        return indexMap.at(url);
+getIfPresent(const Url& url) const {
+    const std::string rawUrl = url.getRawUrl();
+    if (contains(rawUrl)){
+        return indexMap.at(rawUrl);
     }
     return indexMap.at("getDefault");
 }

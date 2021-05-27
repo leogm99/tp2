@@ -5,6 +5,9 @@
 
 PagesHandler::PagesHandler(const std::string& pagesPath)
 : pageHandler(pagesPath.c_str()) {
+    if (!pageHandler.is_open()){
+        throw std::invalid_argument("Could not open Page file\n");
+    }
 }
 
 std::vector <std::string>

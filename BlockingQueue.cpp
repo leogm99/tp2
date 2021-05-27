@@ -1,29 +1,30 @@
 #include "BlockingQueue.h"
+#include "Url.h"
 #include <queue>
 #include <string>
 #include <utility>
 
-BlockingQueue::BlockingQueue(std::queue<std::pair<std::string,
-                             std::string>> &urls)
-: closed(false), urls(urls){
+BlockingQueue::BlockingQueue(TargetLoader& targetLoader)
+: closed(false){
+    targetLoader.loadIntoQueue(urls);
 }
 
-std::string BlockingQueue::pop() {
+Url BlockingQueue::pop() {
     std::unique_lock<std::mutex> lock1(queueMutex);
     while (urls.empty()){
         if (closed){
-            return std::string();
+            return Url("");
         }
         cv.wait(lock1);
     }
-    std::string url = std::move(urls.front()).first;
+    Url url = std::move(urls.front());
     urls.pop(); // bye bye
     return url;
 }
 
-void BlockingQueue::push(std::string&& url) {
+void BlockingQueue::push(Url url) {
     std::unique_lock<std::mutex> lock1(queueMutex);
-    urls.push(std::make_pair(url, "ready"));
+    urls.push(std::move(url));
     cv.notify_all();
 }
 

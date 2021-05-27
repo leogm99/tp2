@@ -1,5 +1,6 @@
 #ifndef TP2_INDEX_H
 #define TP2_INDEX_H
+#include "Url.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -21,7 +22,7 @@ public:
     Index() = delete;
 
     const std::pair<uint32_t, uint32_t>&
-    getIfPresent(const std::string& url) const;
+    getIfPresent(const Url& url) const;
 };
 
 #endif

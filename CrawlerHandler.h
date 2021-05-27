@@ -4,6 +4,8 @@
 #include "Index.h"
 #include "PagesHandler.h"
 #include "BlockingQueue.h"
+#include "Url.h"
+#include "DoneUrlMonitor.h"
 #include <utility>
 #include <map>
 #include <string>
@@ -16,8 +18,7 @@ private:
     Index& index;
     BlockingQueue& q;
     std::string allowed;
-    std::mutex crawlerMutex;
-    std::map<std::string, std::string> doneUrls;
+    DoneUrlMonitor doneUrlMonitor;
 public:
     CrawlerHandler(size_t workers, PagesHandler& pages,
                    Index& index, BlockingQueue& q,

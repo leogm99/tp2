@@ -4,6 +4,7 @@
 #include "Index.h"
 #include "BlockingQueue.h"
 #include "PagesHandler.h"
+#include "DoneUrlMonitor.h"
 #include <utility>
 #include <map>
 #include <string>
@@ -15,13 +16,12 @@ private:
     Index& indexMapping;
     std::string& allowed;
     BlockingQueue& urlsQueue;
-    std::map<std::string, std::string>& doneUrls;
-    std::mutex& crawlerMutex;
+    DoneUrlMonitor& doneUrlMonitor;
 
     void filterAllowed(std::vector<std::string>& rawUrls) const;
     const std::pair<uint32_t, uint32_t>&
-    getUrlInfo(const std::string& url) const;
-    void store(std::pair<std::string, std::string> state);
+    getUrlInfo(const Url& url) const;
+    void store(Url url);
 
 protected:
     void run() override;
@@ -29,8 +29,7 @@ protected:
 public:
     Crawler(PagesHandler& pages, Index& indexMap,
             std::string& allowed, BlockingQueue& queue,
-            std::map<std::string, std::string>& doneUrls,
-            std::mutex& crawlerMutex);
+            DoneUrlMonitor& doneUrls);
 
     // don't want any ugly copies
     Crawler(const Crawler& other) = delete;
@@ -38,7 +37,6 @@ public:
 
     Crawler(Crawler&& other);
     Crawler& operator= (Crawler&& other);
-
 
     ~Crawler() override;
 };

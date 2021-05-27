@@ -12,11 +12,11 @@ CrawlerHandler::CrawlerHandler(size_t workers, PagesHandler &pages,
 
 void CrawlerHandler::doStart(int time) {
     std::vector<Crawler> crawlers;
+    crawlers.reserve(numWorkers);
     for (size_t i = 0; i < numWorkers; ++i){
-        crawlers.emplace_back(std::move(
-            Crawler(pages, index,
+        crawlers.emplace_back(pages, index,
                     allowed, q,
-                    doneUrls, crawlerMutex)));
+                    doneUrlMonitor);
     }
 
     for (auto& crawler : crawlers){
@@ -33,19 +33,21 @@ void CrawlerHandler::doStart(int time) {
 }
 
 void CrawlerHandler::printDone() {
-    for (auto it = doneUrls.begin(); it != doneUrls.end(); ++it)
-        std::cout << it->first << " -> " << it->second << '\n';
+    doneUrlMonitor.print();
 }
 
 CrawlerHandler::CrawlerHandler(CrawlerHandler &&other)
 : numWorkers(other.numWorkers),
   pages(other.pages), index(other.index), q(other.q),
   allowed(std::move(other.allowed)),
-  doneUrls(std::move(other.doneUrls)){
+  doneUrlMonitor(std::move(other.doneUrlMonitor)){
     other.numWorkers = 0;
 }
 
 CrawlerHandler &CrawlerHandler::operator=(CrawlerHandler &&other) {
+    if (this == &other){
+        return *this;
+    }
     this->numWorkers = other.numWorkers;
     other.numWorkers = 0;
     this->allowed = std::move(other.allowed);

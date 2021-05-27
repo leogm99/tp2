@@ -1,5 +1,7 @@
 #ifndef TP2_BLOCKINGQUEUE_H
 #define TP2_BLOCKINGQUEUE_H
+#include "TargetLoader.h"
+#include "Url.h"
 #include <iostream>
 #include <queue>
 #include <mutex>
@@ -11,13 +13,11 @@
 class BlockingQueue {
 private:
     bool closed;
-    std::queue<std::pair<std::string,
-                         std::string>>& urls;
+    std::queue<Url> urls;
     std::mutex queueMutex;
     std::condition_variable cv;
 public:
-    explicit BlockingQueue(std::queue<std::pair<std::string,
-                           std::string>>& urls);
+    explicit BlockingQueue(TargetLoader& targetLoader);
 
     BlockingQueue() = delete;
     BlockingQueue(const BlockingQueue& other) = delete;
@@ -26,8 +26,8 @@ public:
     bool isNotClosedOrNotEmpty();
     void signalClosed();
 
-    std::string pop();
-    void push(std::string&& url);
+    Url pop();
+    void push(Url url);
 };
 
 
