@@ -27,13 +27,15 @@ void BlockingQueue::push(std::string&& url) {
     cv.notify_all();
 }
 
-bool BlockingQueue::isClosed() {
+// continue while
+// q is not closed or its not empty
+bool BlockingQueue::isNotClosedOrNotEmpty() {
     std::unique_lock<std::mutex> lock1(queueMutex);
-    return closed;
+    return (!closed || !urls.empty());
 }
 
 void BlockingQueue::signalClosed() {
     std::unique_lock<std::mutex> lock1(queueMutex);
-    cv.notify_all();
     closed = true;
+    cv.notify_all();
 }

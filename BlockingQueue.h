@@ -23,7 +23,7 @@ public:
     BlockingQueue(const BlockingQueue& other) = delete;
     BlockingQueue& operator=(const BlockingQueue& other) = delete;
 
-    bool isClosed();
+    bool isNotClosedOrNotEmpty();
     void signalClosed();
 
     std::string pop();

@@ -38,7 +38,7 @@ void Crawler::filterAllowed(std::vector<std::string>& rawUrls) const {
 }
 
 void Crawler::run() {
-    while (!urlsQueue.isClosed()) {
+    while (urlsQueue.isNotClosedOrNotEmpty()) {
         std::string url = std::move(urlsQueue.pop());
         if (url.empty()){
             break;
