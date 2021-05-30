@@ -55,7 +55,8 @@ void Crawler::run() {
         url.setExplored();
         store(std::move(url));
         for (std::string& filteredUrl : v) {
-            urlsQueue.push(std::move(filteredUrl));
+            Url newUrl(filteredUrl);
+            urlsQueue.push(std::move(newUrl));
         }
     }
 }
