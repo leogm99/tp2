@@ -1,4 +1,5 @@
 #include "Url.h"
+#include <utility>
 #include <string>
 
 Url::Url(std::string rawUrl)
