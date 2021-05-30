@@ -13,7 +13,7 @@ class TargetLoader {
 private:
     std::ifstream target;
 public:
-    TargetLoader(const char* targetPath);
+    explicit TargetLoader(const char* targetPath);
 
     TargetLoader(const TargetLoader& other) = delete;
     TargetLoader& operator=(const TargetLoader& other) = delete;

@@ -2,8 +2,8 @@
 #include <string>
 
 Url::Url(std::string rawUrl)
-: rawUrl(std::move(rawUrl)){
-    state = "ready";
+: rawUrl(std::move(rawUrl)),
+  state("ready"){
 }
 
 Url::Url(Url &&other)

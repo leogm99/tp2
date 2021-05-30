@@ -2,6 +2,7 @@
 #include "Url.h"
 #include <fstream>
 #include <queue>
+#include <string>
 
 TargetLoader::TargetLoader(const char *targetPath) {
     target.open(targetPath);
@@ -18,7 +19,6 @@ void TargetLoader::loadIntoQueue(std::queue<Url>& urls) {
 }
 
 TargetLoader::~TargetLoader() {
-
 }
 
 TargetLoader::TargetLoader(TargetLoader &&other)

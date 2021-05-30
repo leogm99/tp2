@@ -11,7 +11,7 @@ private:
     std::string rawUrl;
     std::string state;
 public:
-    Url(std::string rawUrl);
+    explicit Url(std::string rawUrl);
 
     Url(const Url& other) = delete;
     Url& operator=(const Url& other) = delete;
