@@ -33,7 +33,7 @@ PagesHandler::operator()(std::pair <uint32_t, uint32_t> urlInfo) {
 }
 
 PagesHandler::PagesHandler(PagesHandler &&other)
-: std::move(other.pageHandler){
+: pageHandler(std::move(other.pageHandler)){
 }
 
 PagesHandler &PagesHandler::operator=(PagesHandler &&other) {

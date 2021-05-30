@@ -34,3 +34,26 @@ Crawler: a la hora de crear el diseño de esta clase, no se sabia la cantidad de
 BlockingQueue: se tuvieron dudas a la hora de saber que tenia que devolver la queue en caso de haber cerrado. Al no tener fresco el manejo de excepciones en C++, se decidio devolver un objeto invalido que notifique a los hilos de que deben terminar su trabajo y salir de scope. 
 
 General: en cuanto al archivo targets, al ser unicamente necesaria su construccion, se decidio no encapsularlo en un objeto sino encontrar las urls y directamente encolarlas (esto desde `main()`). A la hora de hacer un shutdown de la queue, no se sabia si los hilos debian ser notificados. No se encontro una mejora en performance al hacer que cada hilo tenga su propio handler para el archivo pages.
+
+## Correciones
+
+En primer lugar, la correcion mas importante que se hizo sobre el tp fue agregar un monitor para todos los Crawlers, `DoneUrlMonitor`, el cual protege el recurso compartido que son las Urls ya analizadas. Los crawlers, en vez de compartir un mutex y un mapa <url, state_url>, ahora comparten una referencia a un objeto de la clase `DoneUrlMonitor`, el cual tiene el mutex y un Set. 
+La razon por la cual tiene un Set en vez de un Map es que ahora, las Urls ya no son un pair de strings sino que son un objeto que encapsula la url y el estado de la misma (este estado se puede setear mediante metodos), por ende, no hay nada que "mapear", solo hay que poner las urls ordenadas. El set logra que se introduzcan los objetos con un orden (sobrecarga de `operator <` en `Url`), y luego no se tenga que hacer un sort, como seria el caso de un vector por ejemplo. Por ende, ya no hay mas un objeto desprotegido que puede ser victima de una race condition o data race.
+
+Se encapsula ahora la logica del archivo target en un objeto de la clase `TargetLoader`. Este se encarga de abrir el archivo, y cuando la `BlockingQueue` inicia, le pide que le cargue el target en la queue interna, con todas las Url's a analizar. Ademas, todos los objetos relacionados con la lectura de archivos (`TargetLoader`, `PageHandler` e `Index`) lanzan una excepcion si no pudieron abrir el archivo, que corta la ejecucion del proceso antes que este crashee, y logueando el mensaje de error.
+
+Habia un pequeño bug en la logica del programa. Este requiere que los crawlers sigan trabajando a pesar de que la queue este cerrada, ya que esta puede estar no vacia. Como el proceso termina antes del tiempo de sleep del main thread, este bug se "silencio" y nunca se vio reflejado. Ahora, los crawlers llaman al metodo de la `BlockingQueue` `isNotClosedOrEmpty()` para continuar su ejecucion. Como dice el nombre, los crawlers continuan su ejecucion si la cola no esta cerrada **o** no esta vacia, es decir, si esta cerrada pero no esta vacia, continuan hasta que esté vacia. 
+
+Se hicieron cambios mas pequeños tambien. Como sabemos la cantidad de crawlers en tiempo de compilacion, se hace un reserve al vector de crawlers. En index se cambia por std::stringstream que resulta menos verboso que separar el string manualmente. 
+Las asignaciones por movimiento checkean ahora que el objeto que se este tratando de asignar no sea el mismo `(other == &this)`, ya qeu esto podria llevar a corromper el estado del objeto asignado (seguramente se corrompa si esto se deja pasar). Este es otro bug que estaba en la primera entrega.
+
+Al introducir el objeto `Url`, `BlockingQueue` pasa a almacenar objetos de esta clase, y los crawlers tambien se manejan con estos mismos objetos.
+
+Se agrega ahora el diagrama de clases actualizado, ademas corrigiendo que el primero tenia las referencias invertidas y se mostraban asociaciones cuando en realidad estas eran composiciones.
+
+![NewClasses](./otherClassDiagram.png)
+
+Notamos ahora que `CrawlerHandler` esta compuesto por un `DoneUrlMonitor`, y que tiene referencias a un objeto por cada clase de `PagesHandler`, `Index` y `BlockingQueue`. 
+Cada `Crawler` es instanciado por `CrawlerHandler` en el metodo `doStart()`, que le forwardea los objetos necesarios para su ejecucion, por eso mismo cada Crawler depende de `CrawlerHandler`.
+
+Finalmente, en cuanto a los comentarios realizados sobre la ejecucion mas o menos eficiente/veloz sobre algunos metodos, todo ha sido testeado localmente teniendo en cuenta el tiempo de ejecucion para cada tarea (logs que no se subieron a este informe y que no se han guardado).

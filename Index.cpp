@@ -4,6 +4,7 @@
 #include <map>
 #include <mutex>
 #include <utility>
+#include <sstream>
 #include "Index.h"
 
 // Si bien esto se puede hacer con istringstream
@@ -15,19 +16,15 @@ Index::Index(const std::string& index_file_path) {
     }
     // default, se devuelve cuando no encuentro una url
     this->indexMap["getDefault"] = std::make_pair(0, 0);
-
     std::string i_entry;
     while (getline(index_file, i_entry)){
-        std::string url = i_entry.substr(0,
-                                         i_entry.find_first_of(' '));
-        std::size_t end_of_offset = 0;
-        uint32_t offset = std::stoul(i_entry.substr(url.size(),
-                                i_entry.find_first_of(' ')),
-                                &end_of_offset, 16);
-        uint32_t length = std::stoul(i_entry.substr(end_of_offset + url.size(),
-                             i_entry.find_last_of(' ')),
-                                nullptr, 16);
-        this->indexMap[std::move(url)] = std::make_pair(offset, length);
+        std::stringstream s(i_entry);
+        std::string url, offset, length;
+        s >> url >> offset >> length;
+        this->indexMap[std::move(url)] = std::move(
+                           std::make_pair(
+                        std::stoi(offset, 0, 16),
+                        std::stoi(length, 0, 16)));
     }
 }
 
