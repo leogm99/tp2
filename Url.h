@@ -1,7 +1,3 @@
-//
-// Created by leogm99 on 27/5/21.
-//
-
 #ifndef TP2_URL_H
 #define TP2_URL_H
 #include <string>

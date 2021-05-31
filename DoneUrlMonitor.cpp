@@ -16,7 +16,7 @@ void DoneUrlMonitor::store(Url url) {
 
 void DoneUrlMonitor::print() {
     for (const auto& url : doneUrls){
-        std::cout << url.print() << std::endl;
+        std::cout << std::move(url.print()) << std::endl;
     }
 }
 

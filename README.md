@@ -54,6 +54,6 @@ Se agrega ahora el diagrama de clases actualizado, ademas corrigiendo que el pri
 ![NewClasses](./otherClassDiagram.png)
 
 Notamos ahora que `CrawlerHandler` esta compuesto por un `DoneUrlMonitor`, y que tiene referencias a un objeto por cada clase de `PagesHandler`, `Index` y `BlockingQueue`. 
-Cada `Crawler` es instanciado por `CrawlerHandler` en el metodo `doStart()`, que le forwardea los objetos necesarios para su ejecucion, por eso mismo cada Crawler depende de `CrawlerHandler`.
+Cada `Crawler` es instanciado por `CrawlerHandler` en el metodo `doStart()`, que le forwardea los objetos necesarios para su ejecucion, por eso mismo cada Crawler depende de `CrawlerHandler`. A su vez, los crawlers usan `Ulr`'s, las cuales son pusheadas y popeadas a la queue. Estos setean los estados correspondientes mediante los metodos `setExplored()` y `setDead()`.
 
 Finalmente, en cuanto a los comentarios realizados sobre la ejecucion mas o menos eficiente/veloz sobre algunos metodos, todo ha sido testeado localmente teniendo en cuenta el tiempo de ejecucion para cada tarea (logs que no se subieron a este informe y que no se han guardado).
