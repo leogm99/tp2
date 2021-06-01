@@ -7,9 +7,11 @@
 #include <map>
 #include <mutex>
 #include <utility>
+#include <mutex>
 
 class Index {
 private:
+    std::mutex indexMutex;
     std::map<std::string, std::pair<uint32_t, uint32_t>> indexMap;
     bool contains(const std::string& key) const;
 public:
@@ -25,7 +27,7 @@ public:
     Index& operator= (Index&& other);
 
     const std::pair<uint32_t, uint32_t>&
-    getIfPresent(const Url& url) const;
+    getIfPresent(const Url& url);
 };
 
 #endif

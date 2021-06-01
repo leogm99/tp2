@@ -33,7 +33,8 @@ bool Index::contains(const std::string& url) const {
 }
 
 const std::pair<uint32_t, uint32_t>& Index::
-getIfPresent(const Url& url) const {
+getIfPresent(const Url& url) {
+    std::lock_guard<std::mutex> lock(indexMutex);
     const std::string rawUrl = url.getRawUrl();
     if (contains(rawUrl)){
         return indexMap.at(rawUrl);

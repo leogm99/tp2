@@ -51,6 +51,8 @@ Al introducir el objeto `Url`, `BlockingQueue` pasa a almacenar objetos de esta 
 
 Se agrega ahora el diagrama de clases actualizado, ademas corrigiendo que el primero tenia las referencias invertidas y se mostraban asociaciones cuando en realidad estas eran composiciones.
 
+Tambien se agrega un mutex al index, de manera tal que todo recurso compartido en el tp se acceda de manera ordenada y se proteja, mas alla de que no se escriba al index.
+
 ![NewClasses](./otherClassDiagram.png)
 
 Notamos ahora que `CrawlerHandler` esta compuesto por un `DoneUrlMonitor`, y que tiene referencias a un objeto por cada clase de `PagesHandler`, `Index` y `BlockingQueue`. 
